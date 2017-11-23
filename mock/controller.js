@@ -8,12 +8,13 @@ for (let i = 0; i < 46; i += 1) {
     disabled: ((i % 6) === 0),
     href: 'https://ant.design',
     avatar: ['https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png', 'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png'][i % 2],
-    no: `TradeCode ${i}`,
+    no: `${(i + 1)}`,
     title: `一个任务名称 ${i}`,
     owner: '曲丽丽',
-    description: '这是一段描述',
-    callNo: Math.floor(Math.random() * 1000),
-    status: Math.floor(Math.random() * 10) % 4,
+    description: `部门 ${(i + 1)} 的描述`,
+    department: `部门 ${(i + 1)}`,
+    controllers: `管理者 ${(i + 1)}`,
+    status: Math.floor(Math.random() * 10) % 3,
     updatedAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     createdAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     progress: Math.ceil(Math.random() * 100),
@@ -83,12 +84,12 @@ export function postController(req, res, u, b) {
   }
 
   const body = (b && b.body) || req.body;
-  const { method, no, description } = body;
+  const { method, no, description, department } = body;
 
   switch (method) {
     /* eslint no-case-declarations:0 */
     case 'delete':
-      tableListDataSource = tableListDataSource.filter(item => no.indexOf(item.no) === -1);
+      tableListDataSource = tableListDataSource.filter(item => no !== (item.key));
       break;
     case 'post':
       const i = Math.ceil(Math.random() * 10000);
@@ -96,12 +97,13 @@ export function postController(req, res, u, b) {
         key: i,
         href: 'https://ant.design',
         avatar: ['https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png', 'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png'][i % 2],
-        no: `TradeCode ${i}`,
+        no: `${(i + 1)}`,
         title: `一个任务名称 ${i}`,
         owner: '曲丽丽',
         description,
-        callNo: Math.floor(Math.random() * 1000),
-        status: Math.floor(Math.random() * 10) % 2,
+        department: department || `部门 ${(i + 1)}`,
+        controllers: `管理者 ${(i + 1)}`,
+        status: 1,
         updatedAt: new Date(),
         createdAt: new Date(),
         progress: Math.ceil(Math.random() * 100),

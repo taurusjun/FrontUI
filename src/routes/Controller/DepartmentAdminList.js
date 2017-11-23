@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Row, Col, Card, Form, Input, Select, Icon, Button, Dropdown, Menu, InputNumber, DatePicker, Modal, message } from 'antd';
-import StandardTable from '../../components/StandardTable';
+import DepartmentAdminTable from '../../components/DepartmentAdminTable';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 
 import styles from './DepartmentAdminList.less';
@@ -17,6 +17,7 @@ const getValue = obj => Object.keys(obj).map(key => obj[key]).join(',');
 export default class TableList extends PureComponent {
   state = {
     addInputValue: '',
+    addDepartmentValue: '',
     modalVisible: false,
     expandForm: false,
     selectedRows: [],
@@ -30,7 +31,7 @@ export default class TableList extends PureComponent {
     });
   }
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleDepartmentAdminTableChange = (pagination, filtersArg, sorter) => {
     const { dispatch } = this.props;
     const { formValues } = this.state;
 
@@ -138,11 +139,18 @@ export default class TableList extends PureComponent {
     });
   }
 
+  handleAddDepartmentValue = (e) => {
+    this.setState({
+      addDepartmentValue: e.target.value,
+    });
+  }
+
   handleAdd = () => {
     this.props.dispatch({
       type: 'controller/add',
       payload: {
         description: this.state.addInputValue,
+        department: this.state.addDepartmentValue,
       },
     });
 
@@ -152,24 +160,36 @@ export default class TableList extends PureComponent {
     });
   }
 
+  handleRowDelete = (key) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'controller/remove',
+      payload: {
+        no: key,
+      },
+      callback: () => {
+      },
+    });
+  }
+
   renderSimpleForm() {
     const { getFieldDecorator } = this.props.form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则编号">
+            <FormItem label="编号">
               {getFieldDecorator('no')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
+            <FormItem label="状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+                  <Option value="0">生效</Option>
+                  <Option value="1">审批中</Option>
                 </Select>
               )}
             </FormItem>
@@ -194,14 +214,14 @@ export default class TableList extends PureComponent {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则编号">
+            <FormItem label="编号">
               {getFieldDecorator('no')(
                 <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
+            <FormItem label="状态">
               {getFieldDecorator('status')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
                   <Option value="0">关闭</Option>
@@ -211,9 +231,9 @@ export default class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="调用次数">
-              {getFieldDecorator('number')(
-                <InputNumber style={{ width: '100%' }} />
+            <FormItem label="管理者">
+              {getFieldDecorator('string')(
+                <Input placeholder="请输入" />
               )}
             </FormItem>
           </Col>
@@ -227,21 +247,21 @@ export default class TableList extends PureComponent {
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
+            <FormItem label="状态">
               {getFieldDecorator('status3')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+                  <Option value="0">生效</Option>
+                  <Option value="1">审批中</Option>
                 </Select>
               )}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
+            <FormItem label="状态">
               {getFieldDecorator('status4')(
                 <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+                  <Option value="2">未生效</Option>
+                  <Option value="1">审批中</Option>
                 </Select>
               )}
             </FormItem>
@@ -266,7 +286,7 @@ export default class TableList extends PureComponent {
 
   render() {
     const { controller: { loading: controllerLoading, data } } = this.props;
-    const { selectedRows, modalVisible, addInputValue } = this.state;
+    const { selectedRows, modalVisible, addInputValue, addDepartmentValue } = this.state;
 
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
@@ -299,12 +319,13 @@ export default class TableList extends PureComponent {
                 )
               }
             </div>
-            <StandardTable
+            <DepartmentAdminTable
               selectedRows={selectedRows}
               loading={controllerLoading}
               data={data}
+              onDeleteRow={this.handleRowDelete}
               onSelectRow={this.handleSelectRows}
-              onChange={this.handleStandardTableChange}
+              onChange={this.handleDepartmentAdminTableChange}
             />
           </div>
         </Card>
@@ -314,6 +335,13 @@ export default class TableList extends PureComponent {
           onOk={this.handleAdd}
           onCancel={() => this.handleModalVisible()}
         >
+          <FormItem
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 15 }}
+            label="部门名称"
+          >
+            <Input placeholder="请输入" onChange={this.handleAddDepartmentValue} value={addDepartmentValue} />
+          </FormItem>
           <FormItem
             labelCol={{ span: 5 }}
             wrapperCol={{ span: 15 }}
