@@ -1,7 +1,10 @@
 import React, { PureComponent } from 'react';
 import moment from 'moment';
 import { Table, Alert, Badge, Divider, Popconfirm, Modal } from 'antd';
+import DescriptionList from '../DescriptionList';
 import styles from './index.less';
+
+const { Description } = DescriptionList;
 
 const statusMap = ['default', 'processing', 'success', 'error'];
 class DepartmentAdminTable extends PureComponent {
@@ -42,7 +45,7 @@ class DepartmentAdminTable extends PureComponent {
     this.handleRowSelectChange([], []);
   }
 
-  onDetail = (flag, record={}) => {
+  onDetail = (flag, record = {}) => {
     this.setState({
       detailModalVisible: !!flag,
       currentRecord: record,
@@ -108,7 +111,7 @@ class DepartmentAdminTable extends PureComponent {
           <div>
             <a onClick={() => this.onDetail(true, record)}>详情</a>
             <Divider type="vertical" />
-            <a href="">编辑</a>
+            <a>编辑</a>
             <Divider type="vertical" />
             <Popconfirm title="Sure to delete?" onConfirm={() => this.props.onDeleteRow(record.key)}>
               <a href="#">删除</a>
@@ -161,10 +164,16 @@ class DepartmentAdminTable extends PureComponent {
           visible={detailModalVisible}
           onOk={() => this.onDetail(false)}
           onCancel={() => this.onDetail(false)}
+          footer={null}
         >
-          <div>部门：{this.state.currentRecord.department}</div>
-          <div>描述：{this.state.currentRecord.description}</div>
-          <div>管理者：{this.state.currentRecord.controllers}</div>
+          <div>
+            <DescriptionList size="large" title="" style={{ marginLeft: 45, marginBottom: 32 }} col={1}>
+              <Description term="部门名称">{this.state.currentRecord.department}</Description>
+              <Description term="描述">{this.state.currentRecord.description}</Description>
+              <Description term="管理者">{this.state.currentRecord.controllers}</Description>
+              <Description term="状态">{status[this.state.currentRecord.status]}</Description>
+            </DescriptionList>
+          </div>
         </Modal>
       </div>
     );
